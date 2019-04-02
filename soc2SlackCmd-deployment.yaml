@@ -1,0 +1,52 @@
+kind: "Deployment"
+apiVersion: "apps/v1"
+metadata:
+  name: "soc2slackcmd"
+  namespace: snyk-soc2
+  labels:
+    name: "soc2slackcmd"
+spec:
+  replicas: 1
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      name: "soc2slackcmd"
+  template:
+    metadata:
+      labels:
+        name: "soc2slackcmd"
+    spec:
+      containers:
+        -
+          name: "soc2slackcmd"
+          image: "gcr.io/orbital-lacing-193014/soc2slackcmd:latest"
+          imagePullPolicy: Always
+          ports:
+            -
+              name: "soc2slackcmd"
+              containerPort: 8888
+              protocol: "TCP"
+          env:
+            -
+              name: "BOTO_CONFIG"
+              value: "~/.boto"
+            -
+              name: "SLACKTOKEN"
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: slackVerificationToken
+          volumeMounts:
+            - name: gsutil-secret-volume
+              mountPath: /etc/gsutil-secret-volume
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "/workdir/init-script.sh"]
+      volumes:
+        - name: gsutil-secret-volume
+          secret:
+            secretName: gsutil-secret
+           
+          
+---

@@ -1,0 +1,16 @@
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "soc2slacksmd"
+  namespace: snyk-soc2
+spec:
+  ports:
+    -
+      name: "soc2slackcmd"
+      port: 8888
+      targetPort: 8888
+      protocol: "TCP"
+  selector:
+    name: "soc2slackcmd"
+  type: "LoadBalancer"
