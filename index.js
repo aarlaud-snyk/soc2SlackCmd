@@ -11,8 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const server = app.listen(8888, () => { console.log('Express server   listening on port %d in %s mode', server.address().port,   app.settings.env);});
 
 const regex = new RegExp('[a-zA-Z -]+');
-
-
+const soc2Channel='compliance-soc-2';
 process.on('uncaughtException', function (err) {
   console.log(err);
 });
@@ -22,8 +21,13 @@ app.post('/', (req, res) => {
     if(!req.body.token || !req.body.token.match(/^[0-9a-zA-Z]+$/) || req.body.token != process.env.SLACKTOKEN){
 	res.send('401');
 	return
-	}
+    }
+    if(req.body.channel_id != process.env.SOC2SLACKCHANNELID){
+	res.send('This command is only available on the Compliance-soc-2 channel');
+	return
+    }
     if(!req.body.text){
+	console.log(req.body);
         res.send('Sorry, wut? Ask me like "/soc2 companyname email"');
 	return
     }
@@ -45,9 +49,9 @@ app.post('/', (req, res) => {
 		makeReport(companyName, email, responseUrl).then((output) => {
            		sendDelayedResponse(output.responseUrl, output.body);
         	});
-        	res.send("Please wait a few seconds");
+        	res.send({'response_type':'in_channel', 'text':req.body.user_name+' - Generating report for '+email+' at company '+companyName});
+		//logRequestInSoc2Channel(req.body.user_name + " generated a SOC2 report for " + email + " at company " + companyName);
 	}
-
     } else {
         response = "This info doesn't look right....aborting. Let's stick to valid emails, "+
         "simple letters, numbers and maaaaybe hyphens";
@@ -90,7 +94,6 @@ console.log(shellCommand);
 
 
 async function execCmd (shellCommand) {
-//    console.log(shellCommand);
     try{
         const { stdout, stderr } = await exec(shellCommand);
         return stdout;
@@ -113,10 +116,28 @@ const sendDelayedResponse = (responseUrl, body) => {
     console.log(responseUrl);
     axios.post(responseUrl, JSON.stringify(responseBody), {headers: headers})
     .then((res) => {
-    console.log(`statusCode: ${res.statusCode}`)
-    console.log(res)
+      console.log('Report link and password sent');
+    })
+    .catch((error) => {
+      console.error(error)
+    })}
+
+
+
+const logRequestInSoc2Channel = (message) => {
+	 const axios = require('axios');
+    let responseBody = {
+    }
+    let headers = {
+        'Content-Type': 'application/json'
+    }
+    let urlChat='https://slack.com/api/chat.postMessage?token='+process.env.SLACKOAUTHTOKEN+'&channel='+soc2Channel+'&text='+message;
+    axios.post(urlChat, JSON.stringify(responseBody), {headers: headers})
+    .then((res) => {
+    console.log('Logged '+message+ ' at '+Date.now())
     })
     .catch((error) => {
     console.error(error)
     })
+
 }
