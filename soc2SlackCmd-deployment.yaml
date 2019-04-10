@@ -36,6 +36,12 @@ spec:
                 secretKeyRef:
                   name: slack-secret
                   key: slackVerificationToken
+            -
+              name: "SOC2SLACKCHANNELID"
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: SOC2SLACKCHANNELID
           volumeMounts:
             - name: gsutil-secret-volume
               mountPath: /etc/gsutil-secret-volume
