@@ -48,7 +48,6 @@ app.post('/', (req, res) => {
            		sendDelayedResponse(output.responseUrl, output.body);
         	});
         	res.send({'response_type':'in_channel', 'text':req.body.user_name+' - Generating report for '+email+' at company '+companyName});
-		//logRequestInSoc2Channel(req.body.user_name + " generated a SOC2 report for " + email + " at company " + companyName);
 	}
     } else {
         response = "This info doesn't look right....aborting. Let's stick to valid emails, "+
@@ -118,24 +117,7 @@ const sendDelayedResponse = (responseUrl, body) => {
     })
     .catch((error) => {
       console.error(error)
-    })}
-
-
-
-const logRequestInSoc2Channel = (message) => {
-	 const axios = require('axios');
-    let responseBody = {
-    }
-    let headers = {
-        'Content-Type': 'application/json'
-    }
-    let urlChat='https://slack.com/api/chat.postMessage?token='+process.env.SLACKOAUTHTOKEN+'&channel='+soc2Channel+'&text='+message;
-    axios.post(urlChat, JSON.stringify(responseBody), {headers: headers})
-    .then((res) => {
-    console.log('Logged '+message+ ' at '+Date.now())
     })
-    .catch((error) => {
-    console.error(error)
-    })
-
 }
+
+
