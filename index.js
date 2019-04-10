@@ -11,7 +11,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const server = app.listen(8888, () => { console.log('Express server   listening on port %d in %s mode', server.address().port,   app.settings.env);});
 
 const regex = new RegExp('[a-zA-Z -]+');
-const soc2Channel='compliance-soc-2';
 process.on('uncaughtException', function (err) {
   console.log(err);
 });
@@ -27,7 +26,6 @@ app.post('/', (req, res) => {
 	return
     }
     if(!req.body.text){
-	console.log(req.body);
         res.send('Sorry, wut? Ask me like "/soc2 companyname email"');
 	return
     }
