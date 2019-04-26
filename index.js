@@ -38,6 +38,7 @@ app.post('/', (req, res) => {
     text.pop();
     let companyName = text.join(" ");
     if(validator.validate(email) && companyName.match(/^[0-9a-zA-Z \-]+$/)){
+        companyName = companyName.replace(/\s+/g, '-');
         response =  "*Generating SOC2* for: \n"+
         "Company: "+companyName+"\n"+
         "email: "+email+"\n";
